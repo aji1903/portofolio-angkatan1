@@ -1,0 +1,19 @@
+body {
+  background-image: url("../assets/upload/my_logo.png");
+  /* Menggunakan gambar sebagai background */
+  background-size: cover;
+  /* Membuat gambar latar menutupi seluruh halaman */
+  background-position: center;
+  /* Menempatkan gambar di tengah */
+}
+
+#header {
+  background-color: dimgray;
+}
+#sidebar {
+  background: linear-gradient(
+    to right,
+    dimgray,
+    #0f0f0f
+  ); /* Gradien dari atas (hijau) ke bawah (hijau muda) */
+}
