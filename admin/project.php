@@ -2,19 +2,24 @@
 include("../koneksi.php");
 session_start();
 session_regenerate_id();
-$rows = mysqli_query($connect, "SELECT * FROM services ORDER BY id DESC");
+$query = mysqli_query($connect, "SELECT * FROM project ORDER BY id DESC");
+
+
 if (empty($_SESSION['email'])) {
     header('Location: login.php');
 }
-if (isset($_GET['idDeletes'])) {
-    $id = $_GET['idDeletes'];
+if (isset($_GET['delete'])) {
+    $id = $_GET['delete'];
 
-    $fotos = mysqli_query($connect, "SELECT * FROM services WHERE id='$id'");
-    $rowpoto = mysqli_fetch_assoc($fotos);
+    $foto = mysqli_query($connect, "SELECT * FROM project WHERE id='$id'");
+    $rowfoto = mysqli_fetch_assoc($foto);
 
-    unlink("../assets/upload/" . $rowpoto['fotos']);
-    $delete = mysqli_query($connect, "DELETE FROM services WHERE id='$id'");
-    header('Location:service.php?hapus=berhasil');
+    unlink("../assets/upload/" . $rowfoto['foto']);
+    $delete = mysqli_query($connect, "DELETE FROM project WHERE id='$id'");
+    if ($delete) {
+
+        header('Location: project.php?hapus=berhasil');
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -24,7 +29,7 @@ if (isset($_GET['idDeletes'])) {
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Service</title>
+    <title>Project</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -44,11 +49,22 @@ if (isset($_GET['idDeletes'])) {
     <link href="../assets/vendor/quill/quill.bubble.css" rel="stylesheet">
     <link href="../assets/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="../assets/vendor/simple-datatables/style.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css"> -->
 
     <!-- Template Main CSS File -->
     <link href="../assets/css/style.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"> -->
+</head>
 
-    <!-- =======================================================
+
+<!-- Menyertakan jQuery -->
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+
+<!-- Menyertakan JavaScript DataTables -->
+<!-- <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script> -->
+<!-- <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css"> -->
+
+<!-- =======================================================
   * Template Name: NiceAdmin
   * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
   * Updated: Apr 20 2024 with Bootstrap v5.3.3
@@ -58,6 +74,7 @@ if (isset($_GET['idDeletes'])) {
 </head>
 
 <body>
+
 
     <!-- ======= Header ======= -->
     <?php include "../inc/navbar.php" ?>
@@ -85,64 +102,75 @@ if (isset($_GET['idDeletes'])) {
                             <div class="col-12"></div>
                             <div class="col-12">
                                 <div class="card ">
-                                    <div class="card-header text-center fw-bold">Service</div>
+                                    <div class="card-header text-center fw-bold">Data Project</div>
                                     <?php
                                     if (isset($_GET['tambah']) && $_GET['tambah'] == "berhasil") {
                                     ?>
                                         <div class="alert alert-success text-center" role="alert">
-                                            Tambah Data Berhasil!
+                                            Tambah Data Berhasil!!
                                         </div>
 
                                     <?php
-                                    }
+                                    } ?>
+                                    <?php
+                                    if (isset($_GET['edit']) && $_GET['edit'] == "berhasil") {
                                     ?>
+                                        <div class="alert alert-success text-center" role="alert">
+                                            Edit Data Berhasil!!
+                                        </div>
+
+                                    <?php
+                                    } ?>
                                     <?php
                                     if (isset($_GET['hapus']) && $_GET['hapus'] == "berhasil") {
                                     ?>
                                         <div class="alert alert-danger text-center" role="alert">
-                                            Hapus Data Berhasil!
+                                            Hapus Data Berhasil!!
                                         </div>
-
                                     <?php
-                                    }
-                                    ?>
+                                    } ?>
 
                                     <div class="card-body">
                                         <div class="mt-1 mb-1">
-                                            <a href="../function/add_edit_service.php" class="btn btn-primary m-3">Create</a>
+                                            <a href="../function/tambah-project.php" class="btn btn-primary m-3">Create</a>
                                         </div>
-                                        <div class="table table-responsive ">
-                                            <table class="table table-bordered text-canter">
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>Nama Service</th>
-                                                    <th>Foto</th>
-                                                    <th>Action</th>
-
-                                                </tr>
-                                                <?php
-                                                $no = 1;
-                                                foreach ($rows as $row) {
-                                                ?>
-
+                                        <div class="table table-responsive">
+                                            <table class="table table-bordered text-center" id="myTable">
+                                                <thead>
                                                     <tr>
-                                                        <td><?= $no++ ?></td>
-                                                        <td><?= $row['namas'] ?></td>
-                                                        <td><img src="../assets/upload/<?= $row['fotos'] ?>" width="100" alt=""></td>
-
-
-                                                        <td>
-                                                            <a href="../function/add_edit_service.php?idEdits=<?= base64_encode($row['id']) ?>" class="btn btn-primary mb-2">Edit</a>
-                                                            <a onclick="return confirm ('Apakah Anda Yaking Ingin Menghapus??')" href="service.php?idDeletes= <?= $row['id'] ?>" class="btn btn-danger">Delete</a>
-                                                            <form action="profile.php?idst=<?= $row['id'] ?>" method="post">
-                                                                <input onchange="this.form.submit()" type="radio" name="status" <?= isset($row['status']) && $row['status'] == 1 ? 'checked' : '' ?> value="1">
-                                                            </form>
-                                                        </td>
-
+                                                        <th>No</th>
+                                                        <th>Foto</th>
+                                                        <th>Nama</th>
+                                                        <th>Kategori</th>
+                                                        <th>Actions</th>
                                                     </tr>
-                                                <?php
-                                                } ?>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    $no = 1;
+                                                    foreach ($query as $rows) {
+                                                    ?>
+
+                                                        <tr>
+                                                            <td><?= $no++ ?></td>
+                                                            <td><img src="../assets/upload/<?= $rows['foto'] ?>" width="100"> </td>
+                                                            <td><?= $rows['nama'] ?></td>
+                                                            <td><?= $rows['kategori'] ?></td>
+
+                                                            <td>
+                                                                <a href="../function/tambah-project.php?edit=<?= base64_encode($rows['id']) ?>" class="btn btn-success ">Edit</a>
+                                                                <a onclick="return confirm ('Apakah Anda Yakin Ingin Menghapus??')" href="project.php?delete= <?= $rows['id'] ?>" class="btn btn-danger">Delete</a>
+
+                                                            </td>
+
+                                                        </tr>
+                                                    <?php
+                                                    } ?>
+                                                </tbody>
+
                                             </table>
+
+                                            <!-- target="_blank" berfungsi untuk menambahkan tab baru pada saat print pdf -->
                                         </div>
                                     </div>
                                 </div>
@@ -157,6 +185,7 @@ if (isset($_GET['idDeletes'])) {
         </section>
 
     </main><!-- End #main -->
+
 
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
@@ -174,6 +203,7 @@ if (isset($_GET['idDeletes'])) {
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
+
     <!-- Vendor JS Files -->
     <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -186,7 +216,18 @@ if (isset($_GET['idDeletes'])) {
 
     <!-- Template Main JS File -->
     <script src="../assets/js/main.js"></script>
-
+    <script src="https://cdn.datatables.net/v/bs5/dt-2.2.2/datatables.min.js" integrity="sha384-k90VzuFAoyBG5No1d5yn30abqlaxr9+LfAPp6pjrd7U3T77blpvmsS8GqS70xcnH" crossorigin="anonymous"></script>
+    <script
+        src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+        crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script> -->
+    <script>
+        let dataTable = new DataTable("#myTable");
+    </script>
+    <!-- <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 </body>
 
 </html>

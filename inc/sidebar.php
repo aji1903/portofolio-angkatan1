@@ -8,8 +8,8 @@
       <ul class="dropdown-menu">
         <li><a class="dropdown-item" href="../admin/service.php">Service</a></li>
         <li><a class="dropdown-item" href="../admin/resume.php">Resume</a></li>
-        <li><a class="dropdown-item" href="../admin/skill.php">Skill</a></li>
         <li><a class="dropdown-item" href="../admin/project.php">Project</a></li>
+        <li><a class="dropdown-item" href="../admin/skill.php">Skill</a></li>
         <li><a class="dropdown-item" href="../admin/contact.php">Contact</a></li>
         <li><a class="dropdown-item" href="../admin/setting.php">Setting</a></li>
       </ul>
